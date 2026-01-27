@@ -5,8 +5,8 @@ This project implements a simple **resource allocation scheduler** (for meeting 
 The goal is to take a set of time interval requests and assign them to the **minimum number of resources**, using:
 
 - **QuickSort** to order requests
-- A **min-heap** (custom implementation) to track which resource becomes free first
-- An **array/list** to store all requests and their assigned resource
+- Java’s built‑in **PriorityQueue** as a min‑heap to track which resource becomes free first
+- An **ArrayList** to store all requests
 
 The main code file is:
 
@@ -30,8 +30,8 @@ Scheduling rules:
    - then priority (higher first)
    - then ID (alphabetical)
 2. Process requests in this order.
-3. Use a **min-heap** of resources ordered by `nextFreeTime`:
-   - If the earliest-free resource is free by the request’s start time → **reuse** it.
+3. Use a **min-heap** (PriorityQueue) of resources ordered by `nextFreeTime`:
+   - If the earliest-free resource is free at the request’s start time → **reuse** it.
    - Otherwise → **create a new resource**.
 4. Track:
    - `Total Resources Created`
