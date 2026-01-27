@@ -2,169 +2,91 @@ import java.util.*;
 
 public class Problem22_EasyScheduler {
 
-    // Represents one request for a resource
+    // One request for a room/platform
     static class Request {
         String id;
-        int start;
-        int end;
-        int priority;
-        int assignedResource; // which resource this request uses
-
-        Request(String id, int start, int end, int priority) {
-            this.id = id;
-            this.start = start;
-            this.end = end;
-            this.priority = priority;
-            this.assignedResource = 0;
+        int start, end, priority;
+        Request(String id, int s, int e, int p) {
+            this.id = id; this.start = s; this.end = e; this.priority = p;
         }
     }
 
-    // Represents one resource (room / platform)
+    // One resource with a next free time
     static class Resource {
-        int id;
-        int nextFreeTime;
-
-        Resource(int id, int nextFreeTime) {
-            this.id = id;
-            this.nextFreeTime = nextFreeTime;
-        }
+        int id, nextFree;
+        Resource(int id, int t) { this.id = id; this.nextFree = t; }
     }
 
-    // Simple min-heap for Resource, ordered by nextFreeTime
-    static class MinHeap {
-        ArrayList<Resource> data = new ArrayList<>();
-
-        int size() {
-            return data.size();
-        }
-
-        Resource peek() {
-            return data.get(0);
-        }
-
-        void push(Resource r) {
-            data.add(r);
-            siftUp(data.size() - 1);
-        }
-
-        Resource pop() {
-            Resource root = data.get(0);
-            Resource last = data.remove(data.size() - 1);
-            if (!data.isEmpty()) {
-                data.set(0, last);
-                siftDown(0);
-            }
-            return root;
-        }
-
-        void siftUp(int i) {
-            while (i > 0) {
-                int p = (i - 1) / 2;
-                if (data.get(p).nextFreeTime <= data.get(i).nextFreeTime) break;
-                swap(i, p);
-                i = p;
-            }
-        }
-
-        void siftDown(int i) {
-            int n = data.size();
-            while (true) {
-                int left = 2 * i + 1;
-                int right = 2 * i + 2;
-                int smallest = i;
-
-                if (left < n && data.get(left).nextFreeTime < data.get(smallest).nextFreeTime) {
-                    smallest = left;
-                }
-                if (right < n && data.get(right).nextFreeTime < data.get(smallest).nextFreeTime) {
-                    smallest = right;
-                }
-                if (smallest == i) break;
-                swap(i, smallest);
-                i = smallest;
-            }
-        }
-
-        void swap(int i, int j) {
-            Resource tmp = data.get(i);
-            data.set(i, data.get(j));
-            data.set(j, tmp);
-        }
-    }
-
-    static ArrayList<Request> requests = new ArrayList<>();
-    static int totalResources = 0;
-    static int peakUsage = 0;
+    // All requests we collect
+    static ArrayList<Request> reqs = new ArrayList<>();
+    static int totalResources = 0, peakUsage = 0;
     static boolean scheduled = false;
 
-    // Compare a before b (true if a should come first)
+    // a comes before b?
     static boolean better(Request a, Request b) {
-        if (a.start != b.start) return a.start < b.start;          // earlier start first
-        if (a.priority != b.priority) return a.priority > b.priority; // higher priority first
-        return a.id.compareTo(b.id) < 0;                           // smaller id first
+        if (a.start != b.start) return a.start < b.start;
+        if (a.priority != b.priority) return a.priority > b.priority;
+        return a.id.compareTo(b.id) < 0;
     }
 
-    // QuickSort requests according to the rules
-    static void quickSort(ArrayList<Request> arr, int lo, int hi) {
+    // QuickSort by (start, -priority, id)
+    static void quickSort(ArrayList<Request> a, int lo, int hi) {
         if (lo >= hi) return;
-        Request pivot = arr.get((lo + hi) / 2);
+        Request p = a.get((lo + hi) / 2);
         int i = lo, j = hi;
         while (i <= j) {
-            while (better(arr.get(i), pivot)) i++;
-            while (better(pivot, arr.get(j))) j--;
+            while (better(a.get(i), p)) i++;
+            while (better(p, a.get(j))) j--;
             if (i <= j) {
-                Request tmp = arr.get(i);
-                arr.set(i, arr.get(j));
-                arr.set(j, tmp);
-                i++;
-                j--;
+                Request t = a.get(i);
+                a.set(i, a.get(j));
+                a.set(j, t);
+                i++; j--;
             }
         }
-        quickSort(arr, lo, j);
-        quickSort(arr, i, hi);
+        quickSort(a, lo, j);
+        quickSort(a, i, hi);
     }
 
-    static void addRequest(String id, int start, int end, int priority) {
-        requests.add(new Request(id, start, end, priority));
+    static void addRequest(String id, int s, int e, int p) {
+        reqs.add(new Request(id, s, e, p));
         scheduled = false;
-        System.out.println("Added request " + id + " (" + start + "-" + end + "), priority " + priority);
+        System.out.println("Added " + id + " (" + s + "-" + e + "), priority=" + p);
     }
 
     static void scheduleAll() {
-        if (requests.isEmpty()) {
+        if (reqs.isEmpty()) {
             System.out.println("No requests to schedule.");
             return;
         }
+        quickSort(reqs, 0, reqs.size() - 1);
 
-        quickSort(requests, 0, requests.size() - 1);
-        MinHeap heap = new MinHeap();
+        // Min-heap using Java PriorityQueue
+        PriorityQueue<Resource> heap = new PriorityQueue<>(
+                (r1, r2) -> Integer.compare(r1.nextFree, r2.nextFree));
+
         totalResources = 0;
         peakUsage = 0;
 
         System.out.println("Processing requests sorted by start time...");
-        for (Request r : requests) {
-            int assignedId;
-
-            if (heap.size() > 0 && heap.peek().nextFreeTime <= r.start) {
-                Resource res = heap.pop(); // reuse existing resource
-                assignedId = res.id;
+        for (Request r : reqs) {
+            int resId;
+            if (!heap.isEmpty() && heap.peek().nextFree <= r.start) {
+                resId = heap.poll().id;         // reuse room
             } else {
-                assignedId = ++totalResources; // create new resource
+                resId = ++totalResources;       // create new room
             }
-
-            r.assignedResource = assignedId;
-            heap.push(new Resource(assignedId, r.end));
+            heap.offer(new Resource(resId, r.end));
             peakUsage = Math.max(peakUsage, totalResources);
-
-            System.out.println("- " + r.id + " (" + r.start + "-" + r.end + "): Assigned to Resource " + assignedId + ".");
+            System.out.println("- " + r.id + " (" + r.start + "-" + r.end +
+                    "): Assigned to Resource " + resId + ".");
         }
-
         scheduled = true;
     }
 
     static void showStats() {
         if (!scheduled) {
-            System.out.println("Please run SCHEDULE first.");
+            System.out.println("Run SCHEDULE first.");
             return;
         }
         System.out.println("\n=== STATS ===");
@@ -182,15 +104,15 @@ public class Problem22_EasyScheduler {
             String line = sc.nextLine().trim();
             if (line.isEmpty()) continue;
 
-            String[] parts = line.split("\\s+");
-            String cmd = parts[0].toUpperCase();
+            String[] in = line.split("\\s+");
+            String cmd = in[0].toUpperCase();
 
             if (cmd.equals("REQUEST")) {
-                String id = parts[1];
-                int start = Integer.parseInt(parts[2]);
-                int end = Integer.parseInt(parts[3]);
-                int priority = (parts.length >= 5) ? Integer.parseInt(parts[4]) : 0;
-                addRequest(id, start, end, priority);
+                String id = in[1];
+                int s = Integer.parseInt(in[2]);
+                int e = Integer.parseInt(in[3]);
+                int p = (in.length >= 5) ? Integer.parseInt(in[4]) : 0;
+                addRequest(id, s, e, p);
             } else if (cmd.equals("SCHEDULE")) {
                 scheduleAll();
             } else if (cmd.equals("STATS")) {
@@ -201,7 +123,6 @@ public class Problem22_EasyScheduler {
                 System.out.println("Unknown command.");
             }
         }
-
         sc.close();
     }
 }
