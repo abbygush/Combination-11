@@ -9,7 +9,7 @@ public class Auction {
         var stack = new ArrayDeque<Bid>();
         var scanner = new Scanner(System.in);
         String lastBidder = null;
-        Integer minBid = null; // null means auction hasn't started yet
+        Integer minBid = null;
         
         while (true) {
             System.out.print("> ");
@@ -90,7 +90,14 @@ public class Auction {
                         System.out.println("Current: " + stack.peek().user() + " (" + stack.peek().amount() + ")");
                     }
                 }
-                case "EXIT" -> { return; }
+                case "EXIT" -> {
+                    if (stack.isEmpty()) {
+                        System.out.println("No winner. Auction ended with no bids.");
+                    } else {
+                        System.out.println("Auction ended! Winner: " + stack.peek().user() + " with " + stack.peek().amount());
+                    }
+                    return;
+                }
             }
         }
     }
