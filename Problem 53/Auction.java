@@ -1,3 +1,4 @@
+
 import java.util.*;
 
 record Bid(String user, int amount) {
@@ -15,9 +16,15 @@ public class Auction {
             
             switch (p[0]) {
                 case "BID" -> {
+                    if (p.length < 3) {
+                        System.out.println("Error: Invalid format. Use: BID <user> <amount>");
+                        break;
+                    }
                     try {
                         int amt = Integer.parseInt(p[2]);
-                        if (!stack.isEmpty() && amt <= stack.peek().amount()) {
+                        if (amt < 0) {
+                            System.out.println("Error: Bid amount must be a positive whole number.");
+                        } else if (!stack.isEmpty() && amt <= stack.peek().amount()) {
                             System.out.println("Error: Too low.");
                         } else {
                             stack.push(new Bid(p[1], amt));
