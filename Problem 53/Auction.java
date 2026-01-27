@@ -1,7 +1,7 @@
 import java.util.*;
 
 record Bid(String user, int amount) {
-    public String toString() { return amount + ""; }
+    public String toString() { return amount() + ""; }
 }
 
 public class Auction {
@@ -15,25 +15,33 @@ public class Auction {
             
             switch (p[0]) {
                 case "BID" -> {
-                    int amt = Integer.parseInt(p[2]);
-                    if (!stack.isEmpty() && amt <= stack.peek().amount) {
-                        System.out.println("Error: Too low.");
-                    } else {
-                        stack.push(new Bid(p[1], amt));
-                        System.out.println("Current: " + stack.peek().user + " (" + stack.peek().amount + ")");
-                        System.out.println("Stack: " + stack);
+                    try {
+                        int amt = Integer.parseInt(p[2]);
+                        if (!stack.isEmpty() && amt <= stack.peek().amount()) {
+                            System.out.println("Error: Too low.");
+                        } else {
+                            stack.push(new Bid(p[1], amt));
+                            System.out.println("Current: " + stack.peek().user() + " (" + stack.peek().amount() + ")");
+                            System.out.println("Stack: " + stack);
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Error: Bid amount must be a whole number.");
                     }
                 }
                 case "WITHDRAW" -> {
-                    var withdrawn = stack.pop();
-                    System.out.println(withdrawn.user + " retracted.");
-                    if (stack.isEmpty()) System.out.println("No bids remaining.");
-                    else System.out.println("Reverted to " + stack.peek().user + " (" + stack.peek().amount + ")");
-                    System.out.println("Stack: " + stack);
+                    if (stack.isEmpty()) {
+                        System.out.println("Error: No bids to withdraw.");
+                    } else {
+                        var withdrawn = stack.pop();
+                        System.out.println(withdrawn.user() + " retracted.");
+                        if (stack.isEmpty()) System.out.println("No bids remaining.");
+                        else System.out.println("Reverted to " + stack.peek().user() + " (" + stack.peek().amount() + ")");
+                        System.out.println("Stack: " + stack);
+                    }
                 }
                 case "CURRENT" -> {
                     if (stack.isEmpty()) System.out.println("No bids yet.");
-                    else System.out.println("Current: " + stack.peek().user + " (" + stack.peek().amount + ")");
+                    else System.out.println("Current: " + stack.peek().user() + " (" + stack.peek().amount() + ")");
                 }
                 case "EXIT" -> { return; }
             }
