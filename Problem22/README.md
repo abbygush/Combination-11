@@ -1,72 +1,80 @@
-# DSA Problem Combination 11 – Java Implementation
+## Problem 22 – Resource Allocation Scheduler
 
-## Overview
+This project implements a simple **resource allocation scheduler** (for meeting rooms, train platforms, etc.) based on **Problem 22** from your DSA work.
 
-This repository contains the implementation of Problem Combination #11 for the Data Structures and Algorithms (DSA) course.
-All problems are implemented using Java, following efficient algorithmic and data structure principles.
+The goal is to take a set of time interval requests and assign them to the **minimum number of resources**, using:
 
-Each problem is organized into its own package, with a dedicated implementation and documentation.
+- **QuickSort** to order requests
+- Java’s built‑in **PriorityQueue** as a min‑heap to track which resource becomes free first
+- An **ArrayList** to store all requests
 
-## Problem Combination Details
+The main code file is:
 
-Problem Combination #11 includes:
+- `Problem22_EasyScheduler.java`
 
-- **Problem #53 – Multi-Class Auction System** (Easy)
-- **Problem #21 – Real-Time Median Monitor** (Medium)
-- **Problem #22 – Resource Allocation Scheduler** (Hard)
+---
 
-## Technologies Used
+## How It Works (Short Version)
 
-- **Programming Language:** Java
-- **Core Data Structures:**
-  - Priority Queues (Min-Heaps)
-  - Stacks (ArrayDeque)
-  - ArrayLists
-  - HashMaps
-- **Development Tools:**
-  - JDK 8 or later
-  - Any Java-supported IDE (IntelliJ IDEA, Eclipse, VS Code)
+Each **request** has:
 
-## Project Structure
+- `id` – request ID (e.g. `R1`)
+- `start` – start time (integer)
+- `end` – end time (integer)
+- `priority` – optional (default 0, higher number = higher priority)
 
-Each problem folder contains:
+Scheduling rules:
 
-- Source code files
-- A README.md explaining the problem, logic, and execution steps
+1. **Sort** all requests by:
+   - start time (smallest first)
+   - then priority (higher first)
+   - then ID (alphabetical)
+2. Process requests in this order.
+3. Use a **min-heap** (PriorityQueue) of resources ordered by `nextFreeTime`:
+   - If the earliest-free resource is free at the request’s start time → **reuse** it.
+   - Otherwise → **create a new resource**.
+4. Track:
+   - `Total Resources Created`
+   - `Peak Concurrent Usage`
 
-## Team Members & Contributions
+---
 
-### Nebiyu Samuel
+## CLI Commands
 
-**Problem #53 – Multi-Class Auction System** (Easy)
-- Implemented auction logic using a Stack (ArrayDeque) for bid tracking.
-- Added bid withdrawal functionality with stack-based reversion.
-- Managed minimum bid constraints and consecutive bid prevention.
-- Implemented START, BID, WITHDRAW, CURRENT, and EXIT commands.
+Run the program and then type commands like:
 
-### Kidus Amaha
+- `REQUEST <id> <start> <end> [priority]`
+  - Example: `REQUEST R1 0 10`
+  - Example with priority: `REQUEST R2 5 15 2`
+- `SCHEDULE`
+  - Sorts all requests and assigns resources.
+- `STATS`
+  - Shows total resources created and peak usage.
+- `EXIT`
+  - Quits the program.
 
-**Problem #21 – Real-Time Median Monitor** (Medium)
-- Built real-time median tracking using two PriorityQueues (min-heap and max-heap).
-- Maintained balanced heaps for O(log n) median calculation.
-- Implemented ADD, MEDIAN, and DEBUG operations.
-- Demonstrated efficient two-heap method for continuous median tracking.
+Example session:
 
-### Abigiya Sirak
+```text
+REQUEST R1 0 10
+REQUEST R2 5 15
+REQUEST R3 10 20
+REQUEST R4 15 25
 
-**Problem #22 – Resource Allocation Scheduler** (Hard)
-- Designed a resource allocation scheduler using QuickSort and PriorityQueue (min-heap).
-- Optimized resource assignment with O(n log n) sorting and O(log k) heap operations.
-- Implemented REQUEST, SCHEDULE, and STATS commands.
-- Tracks minimum resources needed and peak concurrent usage.
+SCHEDULE
+STATS
+```
 
-## How to Run the Code
+---
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/abbygush/Combination-11.git
-   ```
+## How to Compile and Run
 
-2. **Follow each problem's README.md file to run**
-   - Navigate to the specific problem folder
-   - Compile and run the Java files as instructed in each README
+From the `dsa` folder:
+
+```bash
+javac Problem22_EasyScheduler.java
+java Problem22_EasyScheduler
+```
+
+Then enter commands as shown above.
+
