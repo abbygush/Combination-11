@@ -11,9 +11,9 @@ Each problem is organized into its own package, with a dedicated implementation 
 
 Problem Combination #11 includes:
 
-- **Problem #22 – Resource Allocation Scheduler**
-- **Problem #53 – Multi-Class Auction System**
-- **Problem #21 – Real-Time Median Monitor**
+- **Problem #53 – Multi-Class Auction System** (Easy)
+- **Problem #21 – Real-Time Median Monitor** (Medium)
+- **Problem #22 – Resource Allocation Scheduler** (Hard)
 
 ## Technologies Used
 
@@ -36,17 +36,9 @@ Each problem folder contains:
 
 ## Team Members & Contributions
 
-### Abigiya Sirak
-
-**Problem #22 – Resource Allocation Scheduler**
-- Designed a resource allocation scheduler using QuickSort and PriorityQueue (min-heap).
-- Optimized resource assignment with O(n log n) sorting and O(log k) heap operations.
-- Implemented REQUEST, SCHEDULE, and STATS commands.
-- Tracks minimum resources needed and peak concurrent usage.
-
 ### Nebiyu Samuel
 
-**Problem #53 – Multi-Class Auction System**
+**Problem #53 – Multi-Class Auction System** (Easy)
 - Implemented auction logic using a Stack (ArrayDeque) for bid tracking.
 - Added bid withdrawal functionality with stack-based reversion.
 - Managed minimum bid constraints and consecutive bid prevention.
@@ -54,11 +46,19 @@ Each problem folder contains:
 
 ### Kidus Amaha
 
-**Problem #21 – Real-Time Median Monitor**
+**Problem #21 – Real-Time Median Monitor** (Medium)
 - Built real-time median tracking using two PriorityQueues (min-heap and max-heap).
 - Maintained balanced heaps for O(log n) median calculation.
 - Implemented ADD, MEDIAN, and DEBUG operations.
 - Demonstrated efficient two-heap method for continuous median tracking.
+
+### Abigiya Sirak
+
+**Problem #22 – Resource Allocation Scheduler** (Hard)
+- Designed a resource allocation scheduler using QuickSort and PriorityQueue (min-heap).
+- Optimized resource assignment with O(n log n) sorting and O(log k) heap operations.
+- Implemented REQUEST, SCHEDULE, and STATS commands.
+- Tracks minimum resources needed and peak concurrent usage.
 
 ## How to Run the Code
 
