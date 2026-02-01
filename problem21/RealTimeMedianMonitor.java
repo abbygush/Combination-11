@@ -1,9 +1,8 @@
 import java.util.*;
 public class RealTimeMedianMonitor {
 
-    private PriorityQueue<Integer> maxHeap; // smaller half (max-heap)
-    private PriorityQueue<Integer> minHeap; // larger half (min-heap)
-
+    private PriorityQueue<Integer> maxHeap;
+    private PriorityQueue<Integer> minHeap; 
     public RealTimeMedianMonitor() {
         maxHeap = new PriorityQueue<>(Collections.reverseOrder());
         minHeap = new PriorityQueue<>();
@@ -16,7 +15,6 @@ public class RealTimeMedianMonitor {
             minHeap.offer(value);
         }
 
-        // Balance the heaps
         if (maxHeap.size() > minHeap.size() + 1) {
             minHeap.offer(maxHeap.poll());
         } else if (minHeap.size() > maxHeap.size()) {
